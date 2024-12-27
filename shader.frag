@@ -29,6 +29,7 @@ void main() {
     uv *= scale;
     
     float pattern = 0.0;
+    float maxPattern = 4.0;
     
     float timeScale = u_time * (0.5 + u_sentiment * 1.5);
     
@@ -41,21 +42,24 @@ void main() {
         
         float baseRadius = 0.3 + u_sentiment * 0.1;
         
-        pattern += circle(uv2, vec2(0.0), baseRadius) * (1.0 - layer * 0.2);
+        float layerStrength = (1.0 - layer * 0.2);
+        pattern += circle(uv2, vec2(0.0), baseRadius) * layerStrength * 0.5;
         
         for(float i = 0.0; i < 6.0; i++) {
             float angle = i * 3.14159 * 2.0 / 6.0;
             vec2 center = vec2(cos(angle), sin(angle)) * baseRadius;
-            pattern += circle(uv2, center, baseRadius) * (1.0 - layer * 0.2);
+            pattern += circle(uv2, center, baseRadius) * layerStrength * 0.5;
             
             for(float j = 0.0; j < 6.0; j++) {
                 float angle2 = j * 3.14159 * 2.0 / 6.0;
                 float radiusOffset = sin(timeScale * 2.0 + i + j) * 0.02;
                 vec2 offset = vec2(cos(angle2), sin(angle2)) * (baseRadius + radiusOffset);
-                pattern += circle(uv2, center + offset, baseRadius) * 0.3;
+                pattern += circle(uv2, center + offset, baseRadius) * 0.15;
             }
         }
     }
+    
+    pattern = min(pattern, maxPattern);
     
     float baseHue = mix(0.0, 0.7, u_sentiment);
     float hueVariation = sin(uv.x * 3.0 + uv.y * 2.0 + u_time * 0.2) * 0.1;
